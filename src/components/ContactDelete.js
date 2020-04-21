@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import Modal from './Modal';
 import history from '../history';
 import { fetchContact, deleteContact } from '../actions';
+import { Redirect } from "react-router-dom";
 
 class ContactDelete extends React.Component {
     componentDidMount() {
@@ -27,6 +28,8 @@ class ContactDelete extends React.Component {
     }
 
     render() {
+        const { auth } = this.props;
+        if(!auth.uid) return <Redirect to='/signin'/>
         return (
             <Modal
                 title="Delete Stream"
@@ -38,6 +41,9 @@ class ContactDelete extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-    return { contact: state.contacts[ownProps.match.params.id] }
+    return { 
+        contact: state.contacts[ownProps.match.params.id],
+        auth: state.firebase.auth
+     }
 }
 export default connect(mapStateToProps, { fetchContact, deleteContact })(ContactDelete);

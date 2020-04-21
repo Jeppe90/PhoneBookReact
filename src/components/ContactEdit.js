@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import ContactForm from "./ContactForm";
 import { fetchContact, editContact } from "../actions";
+import { Redirect } from "react-router-dom";
 
 class ContactEdit extends Component {
   componentDidMount() {
@@ -11,6 +12,9 @@ class ContactEdit extends Component {
     this.props.editContact(this.props.match.params.id, formValues);
   };
   render() {
+    const { auth } = this.props;
+    if(!auth.uid) return <Redirect to='/signin'/>
+
     if (!this.props.contact) {
       return <div>Loading..</div>;
     }
@@ -28,6 +32,7 @@ class ContactEdit extends Component {
 const mapStateToProps = (state, ownProps) => {
   return {
     contact: state.contacts[ownProps.match.params.id],
+    auth: state.firebase.auth
   };
 };
 
