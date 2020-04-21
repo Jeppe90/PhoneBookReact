@@ -24,20 +24,7 @@ export const signIn = (credentials) => {
     }
 }
 
-// export const signIn = (userId) => {
-//     return {
-//         type: SIGN_IN,
-//         payload: userId
-//     };
-// };
-// export const signOut = () => {
-//     return {
-//         type: SIGN_OUT
-//     };
-// };
 export const createContact = formValues => async (dispatch, getState, {getFirebase, getFirestore}) => {
-    // const { userId } = getState().auth;
-    //const response = await contacts.post('/contacts', { ...formValues });
     const fireStore = getFirestore();
     fireStore.collection('contacts').add({
         ...formValues,
@@ -51,7 +38,6 @@ export const createContact = formValues => async (dispatch, getState, {getFireba
     }).catch((err) => {
         dispatch({ type: 'CREATE_PROJECT_ERROR', err})
     })
-
 };
 
 export const fetchContacts = () => async dispatch => {
