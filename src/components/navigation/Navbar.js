@@ -1,6 +1,8 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom'
-import GoogleAuth from '../GoogleAuth'
+import SignedInLinks from './SignedInLinks';
+import SignedOutLinks from './SignedOutLinks'
+import { connect } from 'react-redux'
 
  const Navbar = (props) => {
     return(
@@ -8,14 +10,18 @@ import GoogleAuth from '../GoogleAuth'
                 <div className="container">
                     <NavLink to="/" className="brand-logo">AdressBook</NavLink>
                     <ul className="right">
-                        <li><NavLink to="/">Contacts</NavLink></li>
-                        <li><NavLink to="/contacts/new">Add Contact</NavLink></li>
+                        <SignedInLinks/>
+                        <SignedOutLinks/>
                     </ul>
                 </div>
-                        <GoogleAuth/>
             </nav>  
     )
 }
+const mapStateToProps = (state) => {
+    console.log(state);
+    return{
+        
+    }
+}
 
-
-export default Navbar
+export default connect(mapStateToProps)(Navbar)

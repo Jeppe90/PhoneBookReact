@@ -15,6 +15,8 @@ export default (state = {}, action) => {
             return { ...state, [action.payload.id]: action.payload};
         case CREATE_CONTACT:
             return {...state, [action.payload.id]: action.payload};
+        case "CREATE_CONTACT_ERROR":
+            console.log("Create contact error " + action.err);
         case EDIT_CONTACT:
             return {...state, [action.payload.id]: action.payload};
         case DELETE_CONTACT:

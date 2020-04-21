@@ -10,22 +10,48 @@ DELETE_CONTACT,
 EDIT_CONTACT      
 } from './types'
 
-export const signIn = (userId) => {
-    return {
-        type: SIGN_IN,
-        payload: userId
-    };
-};
-export const signOut = () => {
-    return {
-        type: SIGN_OUT
-    };
-};
-export const createContact = formValues => async (dispatch, getState) => {
+export const signIn = (credentials) => {
+    return (dispatch, getState, {getFirebase}) => {
+        const firebase = getFirebase();
+        firebase.auth().signInWithEmailAndPassword(
+            credentials.email,
+            credentials.password
+        ).then(() => {
+            dispatch({ type: 'LOGIN_SUCCESS'})
+        }).catch((err) => {
+            dispatch({ type: 'LOGIN_ERROR', err })
+        })
+    }
+}
+
+// export const signIn = (userId) => {
+//     return {
+//         type: SIGN_IN,
+//         payload: userId
+//     };
+// };
+// export const signOut = () => {
+//     return {
+//         type: SIGN_OUT
+//     };
+// };
+export const createContact = formValues => async (dispatch, getState, {getFirebase, getFirestore}) => {
     // const { userId } = getState().auth;
-    const response = await contacts.post('/contacts', { ...formValues });
-    dispatch({ type: CREATE_CONTACT, payload: response.data});
-    history.push('/')
+    //const response = await contacts.post('/contacts', { ...formValues });
+    const fireStore = getFirestore();
+    fireStore.collection('contacts').add({
+        ...formValues,
+        authorFirstName: 'Jesper',
+        authorId: 1234,
+        createdAt: new Date()
+    }).then(() => {
+        const response = contacts.post('/contacts', { ...formValues });
+        dispatch({ type: CREATE_CONTACT, payload: response.data});
+        history.push('/')
+    }).catch((err) => {
+        dispatch({ type: 'CREATE_PROJECT_ERROR', err})
+    })
+
 };
 
 export const fetchContacts = () => async dispatch => {
