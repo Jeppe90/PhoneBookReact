@@ -3,9 +3,11 @@ import faker from "faker";
 import { Link } from "react-router-dom";
 import { Redirect } from "react-router-dom";
 import { connect } from "react-redux";
+import moment from 'moment'
 
 const ContactDetails = (props) => {
-  const { contact, auth } = props;
+  const { contact, auth, profile } = props;
+  
   if (!auth.uid) return <Redirect to="/signin" />;
   return (
     <div className="ui container comments">
@@ -23,6 +25,12 @@ const ContactDetails = (props) => {
         </div>
         <div className="metadata-phoneNumber">
           <span className="phoneNumber">{contact.phoneNumber}</span>
+        </div>
+        <div>
+            <p>Added: {moment(contact.createdAt).fromNow()}</p>
+        </div>
+        <div>
+            <p>Created by: {profile.firstName}</p>
         </div>
       </div>
       {renderAdmin(contact)}
@@ -49,7 +57,8 @@ function renderAdmin(contact) {
 }
 const mapStateToProps = (state) => {
   return {
-    auth: state.firebase.auth
+    auth: state.firebase.auth,
+    profile: state.firebase.profile
   };
 };
 

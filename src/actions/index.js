@@ -9,7 +9,6 @@ FETCH_CONTACTS,
 DELETE_CONTACT,
 EDIT_CONTACT      
 } from './types'
-import { firestore } from 'firebase';
 
 export const signIn = (credentials) => {
     return (dispatch, getState, {getFirebase}) => {
@@ -18,6 +17,7 @@ export const signIn = (credentials) => {
             credentials.email,
             credentials.password
         ).then(() => {
+            history.push('/')
             dispatch({ type: 'LOGIN_SUCCESS'})
         }).catch((err) => {
             dispatch({ type: 'LOGIN_ERROR', err })
@@ -49,6 +49,7 @@ export const signUp = (newUser) => {
                 initials: newUser.firstName[0] + newUser.lastName[0]
             })
         }).then(() => {
+            history.push('/')
             dispatch({ type: 'SIGNUP_SUCCESS' })
         }).catch(err => {
             dispatch({ type: 'SIGNUP_ERROR', err})
@@ -58,15 +59,18 @@ export const signUp = (newUser) => {
 
 export const createContact = formValues => async (dispatch, getState, {getFirebase, getFirestore}) => {
     const fireStore = getFirestore();
+    const profile = getState().firebase.profile;
+    const authorId = getState().firebase.auth.uid;
     fireStore.collection('contacts').add({
         ...formValues,
-        authorFirstName: 'Jesper',
-        authorId: 1234,
+        authorFirstName: profile.firstName,
+        authorLastName: profile.lastName,
+        authorId: authorId,
         createdAt: new Date()
     }).then(() => {
         const response = contacts.post('/contacts', { ...formValues });
-        dispatch({ type: CREATE_CONTACT, payload: response.data});
         history.push('/')
+        dispatch({ type: CREATE_CONTACT, payload: response.data});
     }).catch((err) => {
         dispatch({ type: 'CREATE_PROJECT_ERROR', err})
     })
