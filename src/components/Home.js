@@ -1,28 +1,43 @@
 import React, { Component } from "react";
-import ContactList from "./ContactList";
-import Notifications from "./Notifications";
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
+import { compose } from 'redux';
+import { firestoreConnect } from 'react-redux-firebase'
+
+import ContactList from "./ContactList";
+import Notifications from "./Notifications";
 
 class Home extends Component {
   render() {
+    console.log("what do i have here " , this.props.auth);
     
-    const { auth } = this.props;
+    
+    const { auth, notifications } = this.props;
     if(!auth.uid) return <Redirect to='/signin'/>
 
     return (
       <div>
+        <div>
         <ContactList />
-        <Notifications />
+        </div>
+        <div>
+        <Notifications notifications={notifications}/>
+        </div>
       </div>
     );
   }
 }
 
 const mapStateToProps = (state) => {
-  console.log(state);
   return{
-    auth: state.firebase.auth
+    auth: state.firebase.auth,
+    notifications: state.firestore.ordered.notifications
+
   }
 }
-export default connect(mapStateToProps)(Home);
+export default compose(
+  connect(mapStateToProps),
+  firestoreConnect([
+    { collection: 'notifications', limit: 3, orderBy: ['time', 'desc']}
+  ])
+  )(Home)

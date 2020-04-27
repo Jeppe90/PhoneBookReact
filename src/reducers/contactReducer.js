@@ -8,6 +8,8 @@ import {
 } from '../actions/types'
 
 export default (state = {}, action) => {
+    console.log("hello " , action.payload);
+    
     switch(action.type){
         case FETCH_CONTACTS:
             return {...state, ..._.mapKeys(action.payload, "id") }; 

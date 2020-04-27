@@ -7,7 +7,7 @@ import moment from 'moment'
 
 const ContactDetails = (props) => {
   const { contact, auth, profile } = props;
-  
+  console.log("profile " , profile);
   if (!auth.uid) return <Redirect to="/signin" />;
   return (
     <div className="ui container comments">

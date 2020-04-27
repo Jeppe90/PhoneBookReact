@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
 import { signUp } from "../actions";
+import ImageUpload from '../components/ImageUpload'
 
 class SignUp extends Component {
   state = {
@@ -9,6 +10,7 @@ class SignUp extends Component {
     password: "",
     firstName: "",
     lastName: "",
+    url: "",
   };
   handleChange = (e) => {
     this.setState({
@@ -19,7 +21,14 @@ class SignUp extends Component {
     e.preventDefault();
     this.props.signUp(this.state);
   };
+  setUrl = (url) =>{
+    this.setState({
+      url
+    })
+  }
   render() {
+    console.log("this url " , this.state.url);
+    
     const { auth, authError } = this.props;
     if (auth.uid) return <Redirect to="/" />;
 
@@ -55,6 +64,11 @@ class SignUp extends Component {
               onChange={this.handleChange}
             ></input>
           </div>
+          <div>
+          <ImageUpload
+            setUrl={this.setUrl}
+           />
+        </div>
           <div>
             <button>Sign up</button>
             <div>{authError ? <p>{authError}</p> : null}</div>
