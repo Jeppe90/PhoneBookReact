@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { signIn } from '../actions'
 import { Redirect } from 'react-router-dom'
 
+
 class SignIn extends Component {
     state = {
         email: '',
@@ -17,7 +18,7 @@ class SignIn extends Component {
     }
     handleSubmit = (e) => {
         e.preventDefault();
-        console.log(this.props.signIn(this.state));
+        this.props.signIn(this.state);
     }
     render() {
         const { authError, auth } = this.props;

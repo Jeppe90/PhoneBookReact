@@ -11,6 +11,11 @@ import {
   FETCH_CONTACTS,
   DELETE_CONTACT,
   EDIT_CONTACT,
+  UPDATE_AVATAR_SUCCESS,
+  UPDATE_AVATAR_ERROR,
+  UPLOAD_AVATAR_SUCCESS,
+  UPLOAD_AVATAR_ERROR
+
 } from "./types";
 
 export const signIn = (credentials) => {
@@ -69,6 +74,57 @@ export const signUp = (newUser) => {
       });
   };
 };
+
+
+export const changeUserAvatar = (userId, imageUrl) => {
+  
+  return (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore();
+    firestore
+          .collection("users")
+          .doc(userId)
+          .update({
+            imgUrl: imageUrl,
+          }).then(() => {
+        dispatch({ type: UPDATE_AVATAR_SUCCESS });
+      })
+      .catch((err) => {
+        dispatch({ type: UPDATE_AVATAR_ERROR, err });
+      });
+  };
+};
+export const uploadImage = () => {
+  return (dispatch, getState, { getFirestore }) => {
+    const storage = getFirestore();
+  const { image } = this.state;
+  const uploadTask = storage.ref(`images/${image.name}`).put(image);
+  uploadTask.on(
+    "state_changed",
+    (snapshot) => {
+      //progress function
+    },
+    (error) => {
+      console.log(error);
+    },
+    () => {
+      //complete function
+      storage
+        .ref("images")
+        .child(image.name)
+        .getDownloadURL()
+        .then((url) => {
+          this.props.changeUserAvatar(this.props.auth.uid, url);
+        }).then(() => {
+          dispatch({ type: UPLOAD_AVATAR_SUCCESS });
+        })
+        .catch((err) => {
+          dispatch({ type: UPLOAD_AVATAR_ERROR });
+        })
+    }
+  );
+  }
+};
+
 
 export const createContact = (formValues) => async (dispatch) => {
   const response = await contacts.post("/contacts", { ...formValues });

@@ -1,55 +1,55 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux'
+import React, { useState } from "react";
+import { storage } from "../config/fbConfig";
 
-import { storage } from '../config/fbConfig'
+const ImageUpload = (props) => {
+  const [image, setImage] = useState(null);
+  const [url, setUrl] = useState("");
 
-class ImageUpload extends Component {
-    state = {
-        image: null,
-        url: ""
+  const handleChange = (e) => {
+    if (e.target.files[0]) {
+      const image = e.target.files[0];
+      setImage(image);
     }
-    handleChange = (e) => {
-        if(e.target.files[0]){
-            const image = e.target.files[0];
-            this.setState(() => ({image}));
-        }
-    }
-    handleUpload = (e) => {
-        e.preventDefault();
-        const {auth} = this.props;
-        const { image } = this.state;
-        const uploadTask = storage.ref(`images/${image.name}`).put(image);
-        uploadTask.on('state_changed',
-         (snapshot) => {
-             //progress function
-         },
-          (error) => {
-              //error function
-              console.log(error);
-         },
-          () => {
-              //complete function
-              storage.ref('images').child(image.name).getDownloadURL().then(url => {
-                  this.props.setUrl(url);
-                  this.setState({url});
-              })
-         })
-    }
-    render(){
-        return(
-            <div>
-                <input type="file" onChange={this.handleChange}/>
-                <button onClick={this.handleUpload}>Upload</button>
-                <br/>
-                <img src={this.state.url} alt="Uploaded images" height="100" width="200"/>
-            </div>
-        );
-    }
-}
-const mapStateToProps = (state) => {
-    return{
-        auth: state.firebase.auth
-    }
-}
+  };
 
-export default connect(mapStateToProps)(ImageUpload)
+  const handleUpload = (e) => {
+    e.preventDefault();
+    const uploadTask = storage.ref(`images/${image.name}`).put(image);
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        //progress function
+      },
+      (error) => {
+        console.log(error);
+      },
+      () => {
+        //complete function
+        storage
+          .ref("images")
+          .child(image.name)
+          .getDownloadURL()
+          .then((url) => {
+            props.setUrl(url);
+            setUrl(url);
+          });
+      }
+    );
+  };
+
+  return (
+    <div>
+      <input type="file" onChange={handleChange} />
+      <button onClick={handleUpload}>Upload</button>
+      <br />
+      <img
+        src={url}
+        alt="Uploaded images"
+        height="100"
+        width="200"
+      />
+    </div>
+  );
+};
+
+export default ImageUpload;

@@ -1,65 +1,64 @@
-import React, { Component } from "react";
-import ContactDetails from "./ContactDetails";
+import React from "react";
+import faker from "faker";
+import { Link } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import { connect } from "react-redux";
-import { fetchContacts } from "../actions";
+import moment from 'moment'
 
-class ContactList extends Component {
-  state = {
-    data: [],
-    loaded: false,
-    message: "",
-    contacts: [],
-    term: "",
-  };
-
-  onInputChange = (e) => {
-    this.setState({
-      term: e.target.value,
-    });
-  };
-  componentDidMount() {
-    this.props.fetchContacts();
-  }
-
-  contactDetails = () => {
-    if (this.props.contacts) {
-      let filteredContacts = this.props.contacts.filter((contact) => {
-        if(contact.name){
-          return (
-            contact.name.toLowerCase().indexOf(this.state.term.toLowerCase()) !==
-            -1
-          );
-        }
-      });
-      return filteredContacts.map((contact) => (
-        <ContactDetails key={contact.id} contact={contact} />
-      ));
-    } else {
-      return <h3>No files found...</h3>;
-    }
-  };
-
-  render() {
-    return (
-      <>
-        <div className="ui container">
-          <div className="search-bar ui segment">
-            <input
-              placeholder="Search"
-              value={this.state.term}
-              onChange={(value) => this.onInputChange(value)}
-            />
-          </div>
+const ContactList = (props) => {
+  const { contact, auth, profile } = props;
+  if (!auth.uid) return <Redirect to="/signin" />;
+  return (
+    <div className="ui container comments">
+      <div className="comment">
+        <a href="/" className="avatar">
+          <img alt="avatar" src={faker.image.avatar()}></img>
+        </a>
+        <div className="content" style={{color: 'white'}}>
+          <a href="/" className="autor">
+            {contact.name}
+          </a>
         </div>
-        <div className="Contact-content">{this.contactDetails()}</div>
-      </>
-    );
-  }
+        <div className="metadata-description" style={{color: 'white'}}>
+          <span className="description">{contact.description}</span>
+        </div>
+        <div className="metadata-phoneNumber" style={{color: 'white'}}>
+          <span className="phoneNumber">{contact.phoneNumber}</span>
+        </div>
+        <div style={{color: 'white'}}>
+            <p>Added: {moment(contact.createdAt).fromNow()}</p>
+        </div>
+        <div style={{color: 'white'}}>
+            <p>Created by: {profile.firstName}</p>
+        </div>
+      </div>
+      {renderAdmin(contact)}
+    </div>
+  );
+};
+function renderAdmin(contact) {
+  return (
+    <div>
+      <Link to={`/contacts/edit/${contact.id}`} className="ui button primary">
+        Edit
+      </Link>
+      <Link
+        to={`/contacts/delete/${contact.id}`}
+        className="ui button negative"
+      >
+        Delete
+      </Link>
+      <Link to={`/contacts/show/${contact.id}`} className="ui button">
+        Details
+      </Link>
+    </div>
+  );
 }
 const mapStateToProps = (state) => {
   return {
-    contacts: Object.values(state.contacts),
+    auth: state.firebase.auth,
+    profile: state.firebase.profile
   };
 };
 
-export default connect(mapStateToProps, { fetchContacts })(ContactList);
+export default connect(mapStateToProps)(ContactList);

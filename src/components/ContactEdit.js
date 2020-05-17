@@ -1,41 +1,36 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from 'react-redux';
 import ContactForm from "./ContactForm";
 import { fetchContact, editContact } from "../actions";
 import { Redirect } from "react-router-dom";
 
-class ContactEdit extends Component {
-  componentDidMount() {
-    this.props.fetchContact(this.props.match.params.id);
-  }
-  onSubmit = (formValues) => {
-    this.props.editContact(this.props.match.params.id, formValues);
-  };
-  render() {
-    const { auth } = this.props;
-    if(!auth.uid) return <Redirect to='/signin'/>
+const ContactEdit = (props) => {
+  const contact = useSelector((state) => state.contacts[props.match.params.id]);
+  const auth = useSelector((state) => state.firebase.auth);
+  const dispatch = useDispatch();
 
-    if (!this.props.contact) {
-      return <div>Loading..</div>;
+  useEffect(() => {
+    const { id } = props.match.params;
+    dispatch(fetchContact(id));
+  }, []);
+
+    const onSubmit = (formValues) => {
+      const { id } = props.match.params;
+      dispatch(editContact(id, formValues));
     }
-    return (
-      <div>
-        <h3>Create a Contact</h3>
-        <ContactForm
-          initialValues={this.props.contact}
-          onSubmit={this.onSubmit}
+
+  if (!auth.uid) return <Redirect to="/signin" />;
+
+  return (
+    <div>
+      <h3>Create a Contact</h3>
+      <ContactForm
+          initialValues={contact}
+          onSubmit={onSubmit}
         />
-      </div>
-    );
-  }
-}
-const mapStateToProps = (state, ownProps) => {
-  return {
-    contact: state.contacts[ownProps.match.params.id],
-    auth: state.firebase.auth
-  };
+    </div>
+
+  );
 };
 
-export default connect(mapStateToProps, { fetchContact, editContact })(
-  ContactEdit
-);
+export default ContactEdit;
